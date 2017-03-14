@@ -1,0 +1,34 @@
+cmake_minimum_required(VERSION 2.8.3)
+project(biped_dummy_plug)
+
+
+find_package(catkin REQUIRED COMPONENTS
+  roscpp
+  rospy
+  std_msgs
+  c_msg
+  message_generation
+  sensor_msgs
+)
+
+
+## Generate added messages and services
+generate_messages(DEPENDENCIES std_msgs sensor_msgs c_msg)
+
+## Declare a catkin package
+catkin_package(CATKIN_DEPENDS message_generation roscpp rospy std_msgs sensor_msgs c_msg message_runtime)
+
+
+
+
+include_directories(include ${catkin_INCLUDE_DIRS})
+
+add_executable(callback_sonar src/callback_sonar.cpp)
+target_link_libraries(callback_sonar ${catkin_LIBRARIES})
+add_executable(callback_ir src/callback_ir.cpp)
+target_link_libraries(callback_ir ${catkin_LIBRARIES})
+add_executable(callback_encoder src/callback_encoder.cpp)
+target_link_libraries(callback_encoder ${catkin_LIBRARIES})
+add_executable(callback_platform_sensors src/callback_platform_sensors.cpp)
+target_link_libraries(callback_platform_sensors ${catkin_LIBRARIES})
+

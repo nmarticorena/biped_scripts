@@ -1,0 +1,262 @@
+#!/usr/bin/env python
+
+
+import rospy
+from std_msgs.msg import String
+from Tkinter import *
+from c_msg.msg import *
+
+
+
+def foo():
+	str = "hello world %s"%rospy.get_time()
+	rospy.loginfo(str)
+	pub_sonar.publish(str)
+	return
+
+def callback_sonar_send():
+	msg_sonar.msg.f_left=int(e_sonar_left.get())
+	msg_sonar.msg.f_right=int(e_sonar_right.get())
+	msg_sonar.msg.b_cent=int(e_sonar_center.get())
+	msg_sonar.step=int(e_sonar_step.get())
+	msg_sonar.state=True
+	pub_sonar.publish(msg_sonar)
+	rospy.loginfo("Dummy: New Sonar dummy has been sent !")
+	return
+
+def callback_sonar_stop():
+	msg_sonar.msg.f_left=0
+	msg_sonar.msg.f_right=0
+	msg_sonar.msg.b_cent=0
+	msg_sonar.state=False
+	pub_sonar.publish(msg_sonar)
+	rospy.loginfo("Dummy: Sonar dummy has been stopped !")
+	return
+
+def callback_encoder_send():
+	msg_encoder.msg.n=int(e_encoder_turns.get())
+	msg_encoder.msg.v=int(e_encoder_speed.get())
+	msg_encoder.step=int(e_encoder_step.get())
+	msg_encoder.state=True
+	pub_encoder.publish(msg_encoder)
+	rospy.loginfo("Dummy: New Encoder dummy has been sent !")
+	return
+
+def callback_encoder_stop():
+	msg_encoder.msg.n=0
+	msg_encoder.msg.v=0
+	msg_encoder.state=False
+	pub_encoder.publish(msg_encoder)
+	rospy.loginfo("Dummy: Encoder dummy has been stopped !")
+	return
+
+def callback_ir_send():
+	msg_ir.msg.isnao=int(e_ir_isnao.get())
+	msg_ir.step=int(e_ir_step.get())
+	msg_ir.state=True
+	pub_ir.publish(msg_ir)
+	rospy.loginfo("Dummy: New IR dummy has been sent !")
+	return
+
+def callback_ir_stop():
+	msg_ir.msg.isnao=0
+	msg_ir.step=0
+	msg_ir.state=False
+	pub_ir.publish(msg_ir)
+	rospy.loginfo("Dummy: IR dummy has been stopped !")
+	return
+
+def callback_platform_send():
+	msg_platform_sensors.msg.eol_left=int(e_platform_eol_left.get())
+	msg_platform_sensors.msg.eol_right=int(e_platform_eol_right.get())
+	msg_platform_sensors.msg.pot_left=int(e_platform_pot_left.get())
+	msg_platform_sensors.msg.pot_right=int(e_platform_pot_right.get())
+	msg_platform_sensors.step=int(e_platform_step.get())
+	msg_platform_sensors.state=True
+	pub_platform_sensors.publish(msg_platform_sensors)
+	rospy.loginfo("Dummy: New Platform Sensors dummy has been sent !")
+	return
+
+
+def callback_platform_stop():
+	msg_platform_sensors.msg.eol_left=0
+	msg_platform_sensors.msg.eol_right=0
+	msg_platform_sensors.msg.pot_left=0
+	msg_platform_sensors.msg.pot_right=0
+	msg_platform_sensors.state=False
+	pub_platform_sensors.publish(msg_platform_sensors)
+	rospy.loginfo("Dummy: New Platform Sensors dummy has been sent !")
+	return
+
+
+
+
+
+#Initialize as node
+rospy.init_node('simsensor_node', anonymous=True)
+
+#Create & Configure Publishers
+pub_sonar = rospy.Publisher('simsensor/t_dummy_sonar', dummy_sonar, queue_size=10)
+pub_encoder = rospy.Publisher('simsensor/t_dummy_encoder', dummy_encoder, queue_size=10)
+pub_ir = rospy.Publisher('simsensor/t_dummy_IR', dummy_IR, queue_size=10)
+pub_platform_sensors = rospy.Publisher('simsensor/t_dummy_platform_sensors', dummy_platform_sensors, queue_size=10)
+
+#Example of msg handle
+#msg_sonar=dummy_sonar()
+#msg_sonar.step=0
+#msg_sonar.state=0
+#msg_sonar.file.data=""
+#msg_sonar.msg.f_left=0
+
+#Create dummy msg objects
+msg_sonar=dummy_sonar()
+msg_encoder=dummy_encoder()
+msg_ir=dummy_IR()
+msg_platform_sensors=dummy_platform_sensors()
+
+#Create main window
+root = Tk()
+root.minsize() #width=500, height=500
+root.wm_title("SimSensor - EVA-01 Dummy Plug")
+
+#Create Main Frame Widget
+win = Frame(root)
+win.grid(sticky=N+S+E+W)
+
+#Create Frames
+frame_sonar =   LabelFrame(win, text='Sonar', padx=5, pady=5)
+frame_encoder = LabelFrame(win, text='Encoder', padx=5, pady=5)
+frame_ir =      LabelFrame(win, text='IR Sensor', padx=5, pady=5)
+frame_platform =LabelFrame(win, text='Platform Sensors', padx=5, pady=5)
+
+frame_sonar.grid(sticky=E+W)
+frame_encoder.grid(sticky=E+W)
+frame_ir.grid(sticky=E+W)
+frame_platform.grid(sticky=E+W)
+
+for frame in frame_sonar, frame_encoder, frame_ir, frame_platform:
+    for col in 0, 1, 2, 3, 4, 5:
+        frame.columnconfigure(col, weight=1)
+
+#Add message labels
+
+#Sonar Labels
+Label(win, text='Left:').grid(in_=frame_sonar,row=0,column=0, sticky=W)
+Label(win, text='Right:').grid(in_=frame_sonar,row=0,column=2, sticky=W)
+Label(win, text='Center:').grid(in_=frame_sonar,row=0,column=4, sticky=W)
+Label(win, text='Step:').grid(in_=frame_sonar,row=0,column=97, sticky=W)
+Label(win, text='                                 ').grid(in_=frame_sonar,row=0,column=50, sticky=W)
+
+#Encoder Labels
+Label(win, text='Turns:').grid(in_=frame_encoder,row=0,column=0, sticky=W)
+Label(win, text='Speed:').grid(in_=frame_encoder,row=0,column=2, sticky=W)
+Label(win, text='Step:').grid(in_=frame_encoder,row=0,column=97, sticky=W)
+Label(win, text='                                 ').grid(in_=frame_encoder,row=0,column=50, sticky=W)
+
+#IR Labels
+Label(win, text='isNAO:').grid(in_=frame_ir,row=0,column=0, sticky=W)
+Label(win, text='Step:').grid(in_=frame_ir,row=0,column=97, sticky=W)
+Label(win, text='                                                      ').grid(in_=frame_ir,row=0,column=50, sticky=W)
+
+#Platform Labels
+Label(win, text='EOL Left:').grid(in_=frame_platform,row=0,column=0, sticky=W)
+Label(win, text='EOL Right:').grid(in_=frame_platform,row=0,column=2, sticky=W)
+Label(win, text='POT Left:').grid(in_=frame_platform,row=0,column=4, sticky=W)
+Label(win, text='POT Right:').grid(in_=frame_platform,row=0,column=6, sticky=W)
+Label(win, text='Step:').grid(in_=frame_platform,row=0,column=97, sticky=W)
+
+#Add Entry Fields
+
+
+#Create Sonar Entries
+e_sonar_left=Entry(win, width=4)
+e_sonar_right=Entry(win, width=4)
+e_sonar_center=Entry(win, width=4)
+e_sonar_step=Entry(win, width=4)
+#Fit them
+e_sonar_left.grid(in_=frame_sonar, row=0, column=1, sticky=W)
+e_sonar_right.grid(in_=frame_sonar, row=0, column=3, sticky=W)
+e_sonar_center.grid(in_=frame_sonar, row=0, column=5, sticky=W)
+e_sonar_step.grid(in_=frame_sonar, row=0, column=98, sticky=W)
+#Add default values
+e_sonar_left.insert(0,"0")
+e_sonar_right.insert(0,"0")
+e_sonar_center.insert(0,"0")
+e_sonar_step.insert(0,"10")
+
+#Create Encoder Entries
+e_encoder_turns=Entry(win, width=4)
+e_encoder_speed=Entry(win, width=4)
+e_encoder_step=Entry(win, width=4)
+#Fit them
+e_encoder_turns.grid(in_=frame_encoder, row=0, column=1, sticky=W)
+e_encoder_speed.grid(in_=frame_encoder, row=0, column=3, sticky=W)
+e_encoder_step.grid(in_=frame_encoder, row=0, column=98, sticky=W)
+#Add default values
+e_encoder_turns.insert(0,"0")
+e_encoder_speed.insert(0,"0")
+e_encoder_step.insert(0,"10")
+
+#Create Encoder Entries
+e_ir_isnao=Entry(win, width=4)
+e_ir_step=Entry(win, width=4)
+#Fit them
+e_ir_isnao.grid(in_=frame_ir, row=0, column=1, sticky=W)
+e_ir_step.grid(in_=frame_ir, row=0, column=98, sticky=W)
+#Add default values
+e_ir_isnao.insert(0,"0")
+e_ir_step.insert(0,"10")
+
+#Create PLatform Entries
+e_platform_eol_left=Entry(win, width=4)
+e_platform_eol_right=Entry(win, width=4)
+e_platform_pot_left=Entry(win, width=4)
+e_platform_pot_right=Entry(win, width=4)
+e_platform_step=Entry(win, width=4)
+#Fit them
+e_platform_eol_left.grid(in_=frame_platform, row=0, column=1, sticky=W)
+e_platform_eol_right.grid(in_=frame_platform, row=0, column=3, sticky=W)
+e_platform_pot_left.grid(in_=frame_platform, row=0, column=5, sticky=W)
+e_platform_pot_right.grid(in_=frame_platform, row=0, column=7, sticky=W)
+e_platform_step.grid(in_=frame_platform, row=0, column=98, sticky=W)
+#Add default values
+e_platform_eol_left.insert(0,"0")
+e_platform_eol_right.insert(0,"0")
+e_platform_pot_left.insert(0,"0")
+e_platform_pot_right.insert(0,"0")
+e_platform_step.insert(0,"10")
+
+#Configure Buttons
+
+
+#Create Sonar Buttons
+b_sonar_send=Button(win,text="Send",command=callback_sonar_send)
+b_sonar_stop=Button(win,text="Stop",command=callback_sonar_stop)
+#Fit them
+b_sonar_send.grid(in_=frame_sonar, row=0, column=99, sticky=W)
+b_sonar_stop.grid(in_=frame_sonar, row=0, column=100, sticky=W)
+
+#Create Encoder Buttons
+b_encoder_send=Button(win,text="Send",command=callback_encoder_send)
+b_encoder_stop=Button(win,text="Stop",command=callback_encoder_stop)
+#Fit them
+b_encoder_send.grid(in_=frame_encoder, row=0, column=99, sticky=W)
+b_encoder_stop.grid(in_=frame_encoder, row=0, column=100, sticky=W)
+
+#Create IR Buttons
+b_ir_send=Button(win,text="Send",command=callback_ir_send)
+b_ir_stop=Button(win,text="Stop",command=callback_ir_stop)
+#Fit themencoder
+b_ir_send.grid(in_=frame_ir, row=0, column=99, sticky=W)
+b_ir_stop.grid(in_=frame_ir, row=0, column=100, sticky=W)
+
+#Create Platform Buttons
+b_platform_send=Button(win,text="Send",command=callback_platform_send)
+b_platform_stop=Button(win,text="Stop",command=callback_platform_stop)
+#Fit them
+b_platform_send.grid(in_=frame_platform, row=0, column=99, sticky=W)
+b_platform_stop.grid(in_=frame_platform, row=0, column=100, sticky=W)
+
+
+win.mainloop()
+

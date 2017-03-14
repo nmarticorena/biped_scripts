@@ -1,0 +1,42 @@
+cmake_minimum_required(VERSION 2.8.3)
+project(c_msg)
+
+find_package(catkin REQUIRED COMPONENTS
+   roscpp
+   rospy
+   std_msgs
+   message_generation
+)
+
+add_message_files(
+   FILES
+   joy.msg
+   encoder.msg
+   IR.msg
+   platform_sensors.msg
+   sonar.msg
+   sonar2.msg
+   dummy_encoder.msg
+   dummy_IR.msg
+   dummy_platform_sensors.msg
+   dummy_sonar.msg
+   MotorVel.msg
+   MotorFeedback.msg
+)
+
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+  kuka_driver
+)
+
+
+catkin_package(
+  INCLUDE_DIRS include
+  LIBRARIES 
+  CATKIN_DEPENDS roscpp message_runtime
+  DEPENDS 
+)
+
+
+

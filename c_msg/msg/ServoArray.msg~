@@ -1,0 +1,6 @@
+int8 left_hip_angle
+int8 left_knee_angle
+int8 left_ankle_angle
+int8 right_hip_angle
+int8 right_knee_angle
+int8 right_ankle_angle

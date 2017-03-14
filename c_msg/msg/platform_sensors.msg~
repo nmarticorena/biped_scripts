@@ -1,0 +1,4 @@
+bool eol_left
+bool eol_right
+uint8 pot_left
+uint8 pot_right

@@ -1,0 +1,93 @@
+#include "ros/ros.h"
+#include "std_msgs/String.h"
+#include <iostream>
+#include "c_msg/sonar.h"
+#include "c_msg/dummy_sonar.h"
+#include <stdlib.h>
+
+class DummySonar{
+
+  //Class member declaration
+
+  //ROS programs uses only onde node per program
+  ros::NodeHandle nodo;
+
+  //Declare publishers and suscribers
+  ros::Publisher publisher;
+  ros::Subscriber subscriber;
+
+  //Messages
+  c_msg::sonar msg;
+  //c_msg::dummy_sonar dummy_msg;
+
+  int rate;
+  bool publish;
+
+  public:
+    DummySonar(int argc, char **argv){
+
+	rate=10;
+	publish=false;
+	publisher = nodo.advertise<c_msg::sonar>("sensor/sonar", 1);
+	subscriber = nodo.subscribe("/simsensor/t_dummy_sonar", 1, &DummySonar::callback,this); 
+	//Uses this pointer to give access to the members
+    }
+    
+    //Main loop, allows to check incoming messages | publish
+    void loop(){
+	while(true){
+	    if(publish & ros::ok() ){ //
+	        ros::Rate loop_rate(rate);
+
+	        publisher.publish(msg);	        
+	        ros::spinOnce(); 		
+	        loop_rate.sleep();
+	    
+	    
+	    }else if(!publish & ros::ok()){ 
+	        //Just wait to receive new orders
+	        ros::Rate loop_rate(10);
+	        ros::spinOnce(); 		
+	        loop_rate.sleep();
+	    
+	    }
+
+	}
+
+    }
+
+    //Callback to incoming message
+    void callback(const c_msg::dummy_sonar& dummy_msg){
+      ROS_INFO_STREAM("Received new order from SimSensor");
+      if(dummy_msg.state==true){
+	ROS_INFO_STREAM("Configuring Dummy");
+        publish=true;
+        msg=dummy_msg.msg;
+	rate=1000/dummy_msg.step;
+      }else{
+          publish=false;
+	  ROS_INFO_STREAM("Killing Dummy");
+          }
+
+      }
+    };
+
+
+int main(int argc, char **argv)
+{
+  
+  //Declare program as ROS node and connects to MASTER
+
+  ros::init(argc, argv, "dummy_sonar"); 
+  //Create DummySonar Object
+  DummySonar sonar(argc,argv);
+
+  ROS_INFO_STREAM("Dummy Sonar has been initialized");
+
+  //Excecutes loop
+  sonar.loop();
+
+
+  return 0;
+}
+
